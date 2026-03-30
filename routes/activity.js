@@ -76,7 +76,22 @@ exports.testEndpoint = async function (req, res) {
             return res.status(400).json({ success: false, error: 'Missing endpointUrl' });
         }
 
-        const response = await axios.post(endpointUrl, { test: true, timestamp: new Date().toISOString() }, {
+        // Build a test payload using the selected field names with sample values
+        const fields = (req.body.fields && Array.isArray(req.body.fields)) ? req.body.fields : [];
+        const testPayload = {};
+        fields.forEach(function (field) {
+            testPayload[field] = 'test_' + field;
+        });
+
+        // Fallback if no fields selected
+        if (Object.keys(testPayload).length === 0) {
+            testPayload.test = true;
+            testPayload.timestamp = new Date().toISOString();
+        }
+
+        console.log('Test endpoint payload:', JSON.stringify(testPayload, null, 2));
+
+        const response = await axios.post(endpointUrl, testPayload, {
             headers: { 'Content-Type': 'application/json' },
             timeout: 10000
         });

@@ -127,6 +127,14 @@ $('#testConnection').on('click', function() {
         return;
     }
 
+    // Gather selected field names to send as test payload
+    var testFields = [];
+    $('.field-checkbox:checked').each(function() {
+        var fieldKey = $(this).val();
+        var parts = fieldKey.split('.');
+        testFields.push(parts[parts.length - 1]);
+    });
+
     $btn.prop('disabled', true).text('Testing...');
     $result.css({ display: 'block', backgroundColor: '#e8f4fd', color: '#032d60', border: '1px solid #1589ee' })
            .text('Sending test request...');
@@ -135,7 +143,7 @@ $('#testConnection').on('click', function() {
         url: '/test-endpoint',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ endpointUrl: endpointUrl }),
+        data: JSON.stringify({ endpointUrl: endpointUrl, fields: testFields }),
         success: function(data) {
             if (data.success) {
                 $result.css({ backgroundColor: '#d4edda', color: '#155724', border: '1px solid #28a745' })
