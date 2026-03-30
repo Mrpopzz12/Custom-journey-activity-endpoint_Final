@@ -1,0 +1,38 @@
+{
+    "workflowApiVersion": "1.1",
+    "key": "af850a11-4c0f-4091-a25e-3e619f27070e",
+    "metaData": {
+        "icon": "images/icon.png",
+        "iconSmall": "images/iconSmall.png",
+        "backgroundColor": "#9f8e69",
+        "category": "Custom"
+    },
+    "type": "REST",
+    "lang": {
+        "en-US": {
+            "name": "Sayan_JourneyCA",
+            "description": "An activity that helps you trigger a journey from another journey.",
+            "step1Label": "Configure Activity"
+        }
+    },
+    "arguments": {
+        "execute": {
+            "inArguments": [],
+            "outArguments": [],
+            "url": "https://custom-journey-activity-test.vercel.app/execute"
+        }
+    },
+    "configurationArguments": {
+        "applicationExtensionKey": "f0a0b74e-42ef-48ff-a51a-718a7e84d90f",
+        "save": { "url": "https://custom-journey-activity-test.vercel.app/save", "verb": "POST" },
+        "publish": { "url": "https://custom-journey-activity-test.vercel.app/publish", "verb": "POST" },
+        "validate": { "url": "https://custom-journey-activity-test.vercel.app/validate", "verb": "POST" }
+    },
+    "userInterfaces": {
+        "configInspector": {
+            "url": "index.html",
+            "height": 500,
+            "width": 500
+        }
+    }
+}
