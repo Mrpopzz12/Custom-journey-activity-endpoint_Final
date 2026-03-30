@@ -67,6 +67,30 @@ exports.stop = function (req, res) {
 };
 
 /*
+ * Test endpoint connectivity from the UI
+ */
+exports.testEndpoint = async function (req, res) {
+    try {
+        const endpointUrl = (req.body && req.body.endpointUrl || '').trim();
+        if (!endpointUrl) {
+            return res.status(400).json({ success: false, error: 'Missing endpointUrl' });
+        }
+
+        const response = await axios.post(endpointUrl, { test: true, timestamp: new Date().toISOString() }, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 10000
+        });
+
+        return res.status(200).json({ success: true, status: response.status, response: response.data });
+    } catch (error) {
+        const msg = error.response
+            ? `${error.response.status} - ${JSON.stringify(error.response.data)}`
+            : error.message;
+        return res.status(200).json({ success: false, error: msg });
+    }
+};
+
+/*
  * Function to POST data to an external endpoint
  */
 async function postToEndpoint(endpointUrl, fieldMappings) {

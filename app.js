@@ -69,6 +69,9 @@ app.post('/execute', activity.execute);
 app.post('/edit', activity.edit);
 app.post('/stop', activity.stop);
 
+// Test endpoint connectivity from UI
+app.post('/test-endpoint', activity.testEndpoint);
+
 // New route to get journeys
 app.get('/journeys', activity.getJourneys);
 

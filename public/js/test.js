@@ -114,3 +114,43 @@ function hydrateFromExistingPayload() {
 
 // 5. Connect the Salesforce 'Next' button to your save function
 connection.on('clickedNext', save);
+
+// 6. Test Connection button handler
+$('#testConnection').on('click', function() {
+    var endpointUrl = ($('#endpointUrl').val() || '').trim();
+    var $btn = $(this);
+    var $result = $('#testResult');
+
+    if (!endpointUrl) {
+        $result.css({ display: 'block', backgroundColor: '#fef0e1', color: '#8c4b0a', border: '1px solid #f0ad4e' })
+               .text('Please enter an endpoint URL first.');
+        return;
+    }
+
+    $btn.prop('disabled', true).text('Testing...');
+    $result.css({ display: 'block', backgroundColor: '#e8f4fd', color: '#032d60', border: '1px solid #1589ee' })
+           .text('Sending test request...');
+
+    $.ajax({
+        url: '/test-endpoint',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ endpointUrl: endpointUrl }),
+        success: function(data) {
+            if (data.success) {
+                $result.css({ backgroundColor: '#d4edda', color: '#155724', border: '1px solid #28a745' })
+                       .html('<strong>Status ' + data.status + '</strong><br>Response: ' + $('<span>').text(JSON.stringify(data.response)).html());
+            } else {
+                $result.css({ backgroundColor: '#f8d7da', color: '#721c24', border: '1px solid #dc3545' })
+                       .text('Error: ' + (data.error || 'Unknown error'));
+            }
+        },
+        error: function(xhr) {
+            $result.css({ backgroundColor: '#f8d7da', color: '#721c24', border: '1px solid #dc3545' })
+                   .text('Request failed: ' + xhr.statusText);
+        },
+        complete: function() {
+            $btn.prop('disabled', false).text('Test Connection');
+        }
+    });
+});

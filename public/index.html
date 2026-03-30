@@ -45,7 +45,9 @@
         <h3>Send Data to Endpoint</h3>
         
         <label for="endpointUrl">Endpoint URL:</label>
-        <input type="text" id="endpointUrl" class="form-control" placeholder="https://your-api.com/receive" style="margin-bottom: 15px;">
+        <input type="text" id="endpointUrl" class="form-control" placeholder="https://your-api.com/receive" style="margin-bottom: 10px;">
+        <button id="testConnection" style="margin-bottom: 15px; padding: 6px 16px; background-color: #0070d2; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">Test Connection</button>
+        <div id="testResult" style="display: none; margin-bottom: 15px; padding: 10px; border-radius: 4px; font-size: 13px; word-break: break-word;"></div>
         
         <label><strong>Select Fields to Send:</strong></label>
         <div id="fieldSelection" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
