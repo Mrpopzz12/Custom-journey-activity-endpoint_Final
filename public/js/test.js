@@ -74,10 +74,18 @@ function save() {
     payload.arguments.execute = payload.arguments.execute || {};
     payload.metaData = payload.metaData || {};
 
-    // Build inArguments with endpoint URL and field mappings
+    // Build inArguments with endpoint URL, journey context, and field mappings
     payload.arguments.execute.inArguments = [{
         endpointUrl: endpointUrl || null,
-        fieldMappings: selectedFields
+        fieldMappings: selectedFields,
+        journeyId: '{{Interaction.Id}}',
+        journeyKey: '{{Interaction.Key}}',
+        journeyName: '{{Interaction.Name}}',
+        activityId: '{{Activity.Id}}',
+        activityKey: '{{Activity.Key}}',
+        activityName: '{{Activity.Name}}',
+        definitionInstanceId: '{{DefinitionInstance.Id}}',
+        activityInstanceId: '{{ActivityInstance.Id}}'
     }];
     
     payload.metaData.isConfigured = true;
