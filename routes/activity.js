@@ -94,10 +94,25 @@ exports.execute = async function (req, res) {
         await postToEndpoint(endpointUrl, endpointPayload);
 
         console.log(`Successfully posted data to endpoint: ${endpointUrl}`);
-        return res.status(200).json({ success: true });
+        // Return with proper outArguments structure
+        return res.status(200).json({ 
+            success: true,
+            outArguments: [
+                {
+                    success: true
+                }
+            ]
+        });
     } catch (error) {
         console.error('Error during endpoint POST execution:', error.response ? error.response.data : error.message);
-        return res.status(200).json({ success: false }); // Do not stop the journey
+        return res.status(200).json({ 
+            success: false,
+            outArguments: [
+                {
+                    success: false
+                }
+            ]
+        });
     }
 };
 
@@ -105,6 +120,10 @@ exports.execute = async function (req, res) {
 exports.publish = function (req, res) {
     logCall('publish', req);
     console.log('=== Publish called ===');
+    // Validate that required configuration is present
+    if (!req.body || !req.body.arguments) {
+        return res.status(400).json({ success: false, error: 'Missing configuration arguments' });
+    }
     res.status(200).json({ success: true });
 };
 
@@ -112,7 +131,26 @@ exports.validate = function (req, res) {
     logCall('validate', req);
     console.log('=== Validate called ===');
     console.log('Validate body:', JSON.stringify(req.body, null, 2));
-    res.status(200).json({ success: true });
+    
+    // Proper validation response format for Marketing Cloud
+    try {
+        if (!req.body || !req.body.arguments) {
+            return res.status(400).json({ 
+                valid: false,
+                errors: ['Missing configuration arguments']
+            });
+        }
+        
+        res.status(200).json({ 
+            valid: true,
+            errors: []
+        });
+    } catch (error) {
+        res.status(200).json({ 
+            valid: false,
+            errors: [error.message]
+        });
+    }
 };
 
 exports.stop = function (req, res) {
