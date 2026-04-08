@@ -31,7 +31,7 @@
         }
     },
     "configurationArguments": {
-        "applicationExtensionKey": "ffba5052-98e6-4983-815f-a5c9035393b9",
+        "applicationExtensionKey": "5f5274bf-e9bc-49b7-a6df-a7b861367890",
         "save": {
             "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/save",
             "verb": "POST",
