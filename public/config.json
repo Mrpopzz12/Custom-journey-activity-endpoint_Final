@@ -1,6 +1,6 @@
 {
     "workflowApiVersion": "1.1",
-    "key":"af850a11-4c0f-4091-a25e-3e619f270143",
+    "key": "af850a11-4c0f-4091-a25e-3e619f270143",
     "metaData": {
         "icon": "images/icon.png",
         "iconSmall": "images/iconSmall.png",
@@ -10,21 +10,24 @@
     "type": "REST",
     "lang": {
         "en-US": {
-            "name": "LOad_test_api endpoint",
+            "name": "Load_test_api endpoint",
             "description": "Sends contact data to an external API endpoint.",
             "step1Label": "Configure Endpoint"
         }
     },
     "arguments": {
         "execute": {
-            "inArguments": [],
-            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/execute",
-            "verb": "POST",
-            "body": "",
-            "header": "",
-            "format": "json",
-            "useJwt": false,
-            "timeout": 10000
+            "inArguments": [
+                {
+                    "endpointUrl": "{{Contact.Attribute._ContactCenter.customEndpointURL}}"
+                }
+            ],
+            "outArguments": [
+                {
+                    "success": "{{Contact.Attribute._ContactCenter.apiSuccess}}"
+                }
+            ],
+            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/execute"
         }
     },
     "configurationArguments": {
@@ -61,8 +64,24 @@
     "schema": {
         "arguments": {
             "execute": {
-                "inArguments": [],
-                "outArguments": []
+                "inArguments": [
+                    {
+                        "endpointUrl": {
+                            "dataType": "string",
+                            "isNullable": false,
+                            "direction": "in"
+                        }
+                    }
+                ],
+                "outArguments": [
+                    {
+                        "success": {
+                            "dataType": "boolean",
+                            "isNullable": true,
+                            "direction": "out"
+                        }
+                    }
+                ]
             }
         }
     }
