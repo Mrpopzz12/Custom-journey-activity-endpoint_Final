@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const errorhandler = require('errorhandler');
@@ -15,35 +16,35 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    
-    // Handle preflight requests
+
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
-    
+
     next();
 });
 
-// Configure Express
+// Basic config
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Express in Development Mode
-if ('development' === app.get('env')) {
-  app.use(errorhandler());
+// Development error handler
+if (app.get('env') === 'development') {
+    app.use(errorhandler());
 }
 
+// Default routes
 app.get('/', routes.index);
 app.post('/', activity.execute);
 app.post('/login', routes.login);
 app.post('/logout', routes.logout);
 
-// Health check endpoint
+// Health check
 app.get('/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'ok', 
+    res.status(200).json({
+        status: 'ok',
         timestamp: new Date().toISOString(),
         env: {
             hasClientId: !!process.env.CLIENT_ID,
@@ -53,7 +54,11 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Custom Routes for MC
+// =========================
+// Journey Builder Endpoints
+// =========================
+
+// Required SFMC endpoints
 app.post('/journeybuilder/save', activity.save);
 app.post('/journeybuilder/validate', activity.validate);
 app.post('/journeybuilder/publish', activity.publish);
@@ -61,7 +66,7 @@ app.post('/journeybuilder/execute', activity.execute);
 app.post('/journeybuilder/edit', activity.edit);
 app.post('/journeybuilder/stop', activity.stop);
 
-// Backwards-compatible aliases (some configs use /save, /execute, etc.)
+// Backward-compatible endpoints (optional)
 app.post('/save', activity.save);
 app.post('/validate', activity.validate);
 app.post('/publish', activity.publish);
@@ -69,30 +74,28 @@ app.post('/execute', activity.execute);
 app.post('/edit', activity.edit);
 app.post('/stop', activity.stop);
 
-// Test endpoint connectivity from UI
+// Test endpoint
 app.post('/test-endpoint', activity.testEndpoint);
 
-// Debug endpoint to see what SFMC sends
+// Debug logs
 app.get('/debug-log', activity.debugLog);
 
-// New route to get journeys
-app.get('/journeys', activity.getJourneys);
+// =========================
+// Removed problematic routes
+// =========================
+// These caused the "Route.get() requires a callback" error earlier
+// because their handlers were undefined or unnecessary in this setup
 
-// New route to get activity data by UUID
-app.get('/activity/:uuid', activity.getActivityByUUID);
+// app.get('/journeys', activity.getJourneys);
+// app.get('/activity/:uuid', activity.getActivityByUUID);
 
-// Start server locally, or export for Vercel
-// if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-//   http.createServer(app).listen(
- //    app.get('port'), function(){
- //      console.log('Express server listening on port ' + app.get('port'));
- //    }
-//   );
-// }
-
+// =========================
+// Server start
+// =========================
 const port = process.env.PORT || 3000;
-http.createServer(app).listen(port, '0.0.0.0', function() {
-  console.log('Express server listening on port ' + port);
+
+http.createServer(app).listen(port, '0.0.0.0', function () {
+    console.log('Express server listening on port ' + port);
 });
- 
+
 module.exports = app;
