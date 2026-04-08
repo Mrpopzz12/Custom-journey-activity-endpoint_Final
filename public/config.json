@@ -1,6 +1,6 @@
 {
     "workflowApiVersion": "1.1",
-    "key": "af850a11-4c0f-4091-a25e-3e619f270143",
+    "key":"af850a11-4c0f-4091-a25e-3e619f270701",
     "metaData": {
         "icon": "images/icon.png",
         "iconSmall": "images/iconSmall.png",
@@ -10,45 +10,42 @@
     "type": "REST",
     "lang": {
         "en-US": {
-            "name": "Load_test_api endpoint",
+            "name": "Vineeth_test_api endpoint",
             "description": "Sends contact data to an external API endpoint.",
             "step1Label": "Configure Endpoint"
         }
     },
     "arguments": {
         "execute": {
-            "inArguments": [
-                {
-                    "endpointUrl": "{{Contact.Attribute._ContactCenter.customEndpointURL}}"
-                }
-            ],
-            "outArguments": [
-                {
-                    "success": "{{Contact.Attribute._ContactCenter.apiSuccess}}"
-                }
-            ],
-            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/execute"
+            "inArguments": [],
+            "url": "https://custom-journey-activity-endpoint.vercel.app/execute",
+            "verb": "POST",
+            "body": "",
+            "header": "",
+            "format": "json",
+            "useJwt": false,
+            "timeout": 10000
         }
     },
     "configurationArguments": {
-        "applicationExtensionKey": "5f5274bf-e9bc-49b7-a6df-a7b861367890",
+        "applicationExtensionKey": "432d1267-809d-480f-af6e-be77b46523cf",
         "save": {
-            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/save",
+            "url": "https://custom-journey-activity-endpoint.vercel.app/save",
             "verb": "POST",
             "useJwt": false
         },
         "publish": {
-            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/publish",
+            "url": "https://custom-journey-activity-endpoint.vercel.app/publish",
             "verb": "POST",
             "useJwt": false
         },
         "validate": {
-            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/validate",
+            "url": "https://custom-journey-activity-endpoint.vercel.app/validate",
             "verb": "POST",
             "useJwt": false
         },
         "stop": {
-            "url": "https://pt2wr9qxye.us-east-1.awsapprunner.com/stop",
+            "url": "https://custom-journey-activity-endpoint.vercel.app/stop",
             "verb": "POST",
             "useJwt": false
         }
@@ -64,24 +61,8 @@
     "schema": {
         "arguments": {
             "execute": {
-                "inArguments": [
-                    {
-                        "endpointUrl": {
-                            "dataType": "string",
-                            "isNullable": false,
-                            "direction": "in"
-                        }
-                    }
-                ],
-                "outArguments": [
-                    {
-                        "success": {
-                            "dataType": "boolean",
-                            "isNullable": true,
-                            "direction": "out"
-                        }
-                    }
-                ]
+                "inArguments": [],
+                "outArguments": []
             }
         }
     }
