@@ -54,12 +54,12 @@ app.get('/health', (req, res) => {
 });
 
 // Custom Routes for MC
-app.post('/journeybuilder/save/', activity.save);
-app.post('/journeybuilder/validate/', activity.validate);
-app.post('/journeybuilder/publish/', activity.publish);
-app.post('/journeybuilder/execute/', activity.execute);
-app.post('/journeybuilder/edit/', activity.edit);
-app.post('/journeybuilder/stop/', activity.stop);
+app.post('/journeybuilder/save', activity.save);
+app.post('/journeybuilder/validate', activity.validate);
+app.post('/journeybuilder/publish', activity.publish);
+app.post('/journeybuilder/execute', activity.execute);
+app.post('/journeybuilder/edit', activity.edit);
+app.post('/journeybuilder/stop', activity.stop);
 
 // Backwards-compatible aliases (some configs use /save, /execute, etc.)
 app.post('/save', activity.save);
