@@ -1,62 +1,30 @@
 "use strict";
 
 // Deps
-var express = require("express");
-var router = express.Router();
+var activity = require("./activity");
 
 /*
- * GET Home Page
- * This loads your UI (index.html / view)
+ * GET home page.
  */
-exports.index = function (req, res) {
-    try {
-        console.log("Loading Journey Builder UI");
-
-        return res.render("index", {
-            title: "Journey Builder Custom Activity"
-        });
-
-    } catch (error) {
-        console.error("❌ Error rendering index:", error);
-        return res.status(500).send("Error loading UI");
-    }
+exports.index = function(req, res) {
+	if (!req.session.token) {
+		res.render("index", {
+			title: "Unauthenticated",
+			errorMessage: "This app may only be loaded via Salesforce Marketing Cloud"
+		});
+	} else {
+		res.render("index", {
+			title: "Journey Builder Activity",
+			results: activity.logExecuteData
+		});
+	}
 };
 
-/*
- * LOGIN (Optional - for SFMC handshake, safe fallback)
- */
-exports.login = function (req, res) {
-    try {
-        console.log("Login request received:", req.body);
-
-        return res.status(200).json({
-            success: true,
-            message: "Login successful"
-        });
-
-    } catch (error) {
-        console.error("❌ Login error:", error);
-        return res.status(500).json({
-            success: false
-        });
-    }
+exports.login = function(req, res) {
+	console.log("req.body: ", req.body);
+	res.redirect("/");
 };
 
-/*
- * LOGOUT (Optional)
- */
-exports.logout = function (req, res) {
-    try {
-        console.log("Logout request received");
-
-        return res.status(200).json({
-            success: true
-        });
-
-    } catch (error) {
-        console.error("❌ Logout error:", error);
-        return res.status(500).json({
-            success: false
-        });
-    }
+exports.logout = function(req, res) {
+	req.session.token = "";
 };
