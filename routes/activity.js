@@ -2,7 +2,7 @@
 const axios = require("axios");
 
 // In-memory log of last N SFMC calls (for debugging)
-var debugLog = [];
+let debugLog = [];
 
 function logCall(route, req) {
     debugLog.push({
@@ -12,34 +12,34 @@ function logCall(route, req) {
         body: req.body,
         timestamp: new Date().toISOString()
     });
+
     if (debugLog.length > 20) debugLog.shift();
 }
 
+// Debug endpoint
 exports.debugLog = function (req, res) {
-    res.status(200).json(debugLog);
+    return res.status(200).json(debugLog);
 };
 
 /*
- * POST Handlers
+ * EDIT
  */
-
 exports.edit = function (req, res) {
     logCall('edit', req);
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true });
 };
 
-exports.save = async function (req, res) {
+/*
+ * SAVE
+ */
+exports.save = function (req, res) {
     logCall('save', req);
-    try {
-        const payload = req.body;
-        await saveToDatabase(payload);
-        res.status(200).json({ success: true });
-    } catch (error) {
-        console.error('Error saving data:', error);
-        res.status(500).json({ success: false, error: 'Error saving data' });
-    }
+    return res.status(200).json({ success: true });
 };
 
+/*
+ * EXECUTE (MAIN LOGIC)
+ */
 exports.execute = async function (req, res) {
     logCall('execute', req);
 
@@ -47,75 +47,81 @@ exports.execute = async function (req, res) {
         console.log('=== Execute called ===');
         console.log('Request body:', JSON.stringify(req.body, null, 2));
 
-        const args = (req.body && req.body.inArguments && req.body.inArguments[0]) ? req.body.inArguments[0] : {};
+        const args = req.body?.inArguments?.[0] || {};
 
+        // ✅ Endpoint URL
         const endpointUrl = (args.endpointUrl || process.env.ENDPOINT_URL || '').trim();
 
-        const reservedKeys = ['endpointUrl', '_fieldMappingKeys', '_journeyContextKeys'];
-        const endpointPayload = {};
-
-        Object.keys(args).forEach(function (key) {
-            if (reservedKeys.indexOf(key) === -1) {
-                endpointPayload[key] = args[key];
+        // ✅ Parse EventData (ALL Entry DE fields)
+        let eventData = args.EventData;
+        if (typeof eventData === "string") {
+            try {
+                eventData = JSON.parse(eventData);
+            } catch (e) {
+                console.warn('⚠️ Failed to parse EventData, using raw value');
             }
-        });
+        }
 
-        const journeyContextMap = {
-            journeyId: req.body.journeyId,
-            journeyKey: req.body.keyValue,
-            journeyName: req.body.journeyName,
-            activityId: req.body.activityId || req.body.activityObjectID,
-            activityKey: req.body.activityKey,
-            activityName: req.body.activityName,
-            definitionInstanceId: req.body.definitionInstanceId,
-            activityInstanceId: req.body.activityInstanceId
+        // ✅ Journey Context
+        const journeyContext = args.journeyContext || {};
+
+        // ✅ Final Payload
+        const endpointPayload = {
+            contact: {
+                contactKey: args.ContactKey || null,
+                email: args.EmailAddress || null
+            },
+            eventData: eventData || {},
+            journeyContext: journeyContext || {},
+            meta: {
+                receivedAt: new Date().toISOString()
+            }
         };
 
-        const selectedJourneyKeys = (args._journeyContextKeys || '').split(',').filter(Boolean);
-
-        selectedJourneyKeys.forEach(function (key) {
-            if (journeyContextMap[key] !== undefined && journeyContextMap[key] !== null) {
-                endpointPayload[key] = journeyContextMap[key];
-            }
-        });
-
         console.log('Endpoint URL:', endpointUrl);
-        console.log('Endpoint Payload:', JSON.stringify(endpointPayload, null, 2));
+        console.log('Final Payload:', JSON.stringify(endpointPayload, null, 2));
 
+        // ❌ Validate endpoint
         if (!endpointUrl) {
-            console.error('Execute error: missing endpointUrl');
-            return res.status(200).json({ success: false, error: 'Missing endpointUrl' });
+            console.error('❌ Missing endpointUrl');
+            return res.status(200).json({
+                success: false,
+                outArguments: [{ success: false, error: "Missing endpointUrl" }]
+            });
         }
 
-        if (Object.keys(endpointPayload).length === 0) {
-            console.error('Execute error: no fields selected');
-            return res.status(200).json({ success: false, error: 'No fields selected' });
-        }
+        // 🚀 Call external API
+        const response = await postToEndpoint(endpointUrl, endpointPayload);
 
-        await postToEndpoint(endpointUrl, endpointPayload);
+        console.log('✅ External API Success');
 
         return res.status(200).json({
             success: true,
             outArguments: [
-                { success: true }
+                {
+                    success: true,
+                    response: response || null
+                }
             ]
         });
 
     } catch (error) {
-        console.error('Error during execute:', error.response ? error.response.data : error.message);
+        console.error('❌ Execute error:', error.response ? error.response.data : error.message);
 
         return res.status(200).json({
             success: false,
             outArguments: [
-                { success: false }
+                {
+                    success: false,
+                    error: error.message
+                }
             ]
         });
     }
 };
 
 /*
- * ✅ FIXED VALIDATE ENDPOINT
- * No validation on request body — SFMC may send empty payload
+ * VALIDATE
  */
 exports.validate = function (req, res) {
     logCall('validate', req);
@@ -129,45 +135,42 @@ exports.validate = function (req, res) {
     });
 };
 
+/*
+ * PUBLISH
+ */
 exports.publish = function (req, res) {
     logCall('publish', req);
-
     console.log('=== Publish called ===');
 
-    if (!req.body || !req.body.arguments) {
-        return res.status(200).json({ success: false });
-    }
-
-    res.status(200).json({ success: true });
-};
-
-exports.stop = function (req, res) {
-    logCall('stop', req);
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true });
 };
 
 /*
- * Test endpoint
+ * STOP
+ */
+exports.stop = function (req, res) {
+    logCall('stop', req);
+    return res.status(200).json({ success: true });
+};
+
+/*
+ * TEST ENDPOINT (Manual testing)
  */
 exports.testEndpoint = async function (req, res) {
     try {
-        const endpointUrl = (req.body && req.body.endpointUrl || '').trim();
+        const endpointUrl = (req.body?.endpointUrl || '').trim();
 
         if (!endpointUrl) {
-            return res.status(400).json({ success: false, error: 'Missing endpointUrl' });
+            return res.status(400).json({
+                success: false,
+                error: 'Missing endpointUrl'
+            });
         }
 
-        const fields = (req.body.fields && Array.isArray(req.body.fields)) ? req.body.fields : [];
-        const testPayload = {};
-
-        fields.forEach(function (field) {
-            testPayload[field] = 'test_' + field;
-        });
-
-        if (Object.keys(testPayload).length === 0) {
-            testPayload.test = true;
-            testPayload.timestamp = new Date().toISOString();
-        }
+        const testPayload = {
+            test: true,
+            timestamp: new Date().toISOString()
+        };
 
         const response = await axios.post(endpointUrl, testPayload, {
             headers: { 'Content-Type': 'application/json' },
@@ -195,22 +198,14 @@ exports.testEndpoint = async function (req, res) {
 /*
  * Helper: POST to external endpoint
  */
-async function postToEndpoint(endpointUrl, fieldMappings) {
-    console.log('Posting to endpoint:', endpointUrl);
-    console.log('Payload:', JSON.stringify(fieldMappings, null, 2));
+async function postToEndpoint(endpointUrl, payload) {
+    console.log('➡️ Posting to endpoint:', endpointUrl);
 
-    const response = await axios.post(endpointUrl, fieldMappings, {
+    const response = await axios.post(endpointUrl, payload, {
         headers: { 'Content-Type': 'application/json' },
         timeout: 10000
     });
 
-    console.log('Endpoint response:', response.status, response.data);
+    console.log('⬅️ Endpoint response:', response.status);
     return response.data;
-}
-
-/*
- * Placeholder DB function
- */
-async function saveToDatabase() {
-    return;
 }
