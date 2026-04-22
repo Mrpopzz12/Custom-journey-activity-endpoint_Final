@@ -52,7 +52,7 @@
     },
     "userInterfaces": {
         "configModal": {
-            "url": "https://custom-journey-activity-endpoint-final.onrender.com/index.html",
+            "url": "https://custom-journey-activity-endpoint-final.onrender.com/",
             "height": 600,
             "width": 700,
             "fullscreen": false
