@@ -16,11 +16,12 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-
+    // 🟢 ADD THESE TWO LINES — allows SFMC to load your app in an iframe
+    res.header('X-Frame-Options', 'ALLOWALL');
+    res.header('Content-Security-Policy', "frame-ancestors 'self' https://*.exacttarget.com https://*.marketingcloudapps.com https://*.salesforce.com https://*.marketing.adobe.com");
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
-
     next();
 });
 
@@ -36,7 +37,9 @@ if (app.get('env') === 'development') {
 }
 
 // Default routes
-app.get('/', routes.index);
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 app.post('/', activity.execute);
 app.post('/login', routes.login);
 app.post('/logout', routes.logout);
