@@ -10,7 +10,7 @@
     "type": "REST",
     "lang": {
         "en-US": {
-            "name": "Custom_Activity_Load_Test_Final",
+            "name": "POC_PR",
             "description": "Sends contact data to an external API endpoint.",
             "step1Label": "Configure Endpoint"
         }
