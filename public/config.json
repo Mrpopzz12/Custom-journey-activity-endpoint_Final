@@ -28,7 +28,7 @@
         }
     },
     "configurationArguments": {
-        "applicationExtensionKey": "a6f03875-2b56-4770-a639-0c8205cbf266",
+        "applicationExtensionKey": "6d312396-0f0d-42ef-8135-22fec1b7c47e",
         "save": {
             "url": "https://custom-journey-activity-endpoint-final.onrender.com/save",
             "verb": "POST",
