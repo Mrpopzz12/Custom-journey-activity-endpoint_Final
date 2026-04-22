@@ -18,7 +18,7 @@
     "arguments": {
         "execute": {
             "inArguments": [],
-            "url": "https://ppvevagph2.us-east-1.awsapprunner.com/execute",
+            "url": "https://custom-journey-activity-endpoint-final.onrender.com/execute",
             "verb": "POST",
             "body": "",
             "header": "",
